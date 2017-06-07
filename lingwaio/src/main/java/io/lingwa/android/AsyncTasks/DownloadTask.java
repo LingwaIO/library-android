@@ -20,8 +20,8 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
     private static final int CONNECTION_TIMEOUT_MS = 20000;
     private static final int CONNECTION_RETRY = 3;
 
-    private static final String URL = "http://10.0.2.2:8085"; //local
-    //private static final String URL = "http://app.lingwa.io";
+    //private static final String URL = "http://10.0.2.2:8085"; //local
+    private static final String URL = "http://app.lingwa.io";
     private static final String TAG = "LingwaDownloadTask";
 
     private OnDownloadRequestCompleted onDownloadRequestCompleted;
