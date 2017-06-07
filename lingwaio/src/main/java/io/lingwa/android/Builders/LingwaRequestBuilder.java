@@ -37,6 +37,10 @@ public class LingwaRequestBuilder {
     }
 
     public String getText() {
-        return instance.getTranslation(labelName, languageCode);
+        String text = instance.getTranslation(labelName, languageCode);
+        if(text==null){
+            text = "";
+        }
+        return text;
     }
 }

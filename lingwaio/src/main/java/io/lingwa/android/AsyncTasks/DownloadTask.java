@@ -1,6 +1,7 @@
 package io.lingwa.android.AsyncTasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,8 +18,10 @@ import java.net.URL;
 public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadTaskResponse> {
 
     private static final int CONNECTION_TIMEOUT_MS = 20000;
+    private static final int CONNECTION_RETRY = 3;
 
-    private static final String URL = "http://app.lingwa.io/translations?token=";
+    private static final String URL = "http://10.0.2.2:8085"; //local
+    //private static final String URL = "http://app.lingwa.io";
     private static final String TAG = "LingwaDownloadTask";
 
     private OnDownloadRequestCompleted onDownloadRequestCompleted;
@@ -29,6 +32,7 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
 
     @Override
     protected DownloadTaskResponse doInBackground(String... params) {
+        Log.d(TAG, "Downloading...");
         String projectCode = params[0];
         if(projectCode == null){
             return new DownloadTaskResponse(0, "Project code is null");
@@ -36,9 +40,8 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
 
         try {
             InputStream is = null;
-
             try {
-                URL url = new URL(URL + projectCode);
+                URL url = new URL(URL + "/translations?token=" + projectCode);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(CONNECTION_TIMEOUT_MS);  /* milliseconds */
                 conn.setConnectTimeout(CONNECTION_TIMEOUT_MS); /* milliseconds */
@@ -46,7 +49,11 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
                 conn.setDoInput(true);
                 conn.connect();
                 int responseCode = conn.getResponseCode();
-                is = conn.getInputStream();
+                if(responseCode == 200){
+                    is = conn.getInputStream();
+                } else {
+                    is = conn.getErrorStream();
+                }
 
                 return new DownloadTaskResponse(responseCode, convertInputStreamToString(is));
             } catch (SecurityException e){
