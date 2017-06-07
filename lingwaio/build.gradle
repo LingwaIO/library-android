@@ -14,7 +14,7 @@ ext {
     siteUrl = 'http://lingwa.io'
     gitUrl = 'https://github.com/LingwaIO/library-android.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.1.2'
 
     developerId = 'kriskast'
     developerName = 'Christian Castaldi'
@@ -55,4 +55,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-apply from: 'bintrayv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
