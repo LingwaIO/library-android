@@ -43,7 +43,7 @@ public class LingwaInstance {
     private void checkCacheAndLabels(){
         if(isCacheExpired() && !isDownloading){
             isDownloading = true;
-            DownloadTask downloadTask = new DownloadTask(new DownloadTask.OnDownloadRequestCompleted() {
+            DownloadTask downloadTask = new DownloadTask(configuration.getProjectCode(), new DownloadTask.OnDownloadRequestCompleted() {
                 @Override
                 public void onRequestSuccessful(String result) {
                     isDownloading = false;
@@ -66,7 +66,7 @@ public class LingwaInstance {
                     }
                 }
             });
-            downloadTask.execute(configuration.getProjectCode());
+            downloadTask.execute();
         } else if(labels==null) {
             getLabelsFromCache();
         }

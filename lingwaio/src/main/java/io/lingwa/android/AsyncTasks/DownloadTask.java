@@ -17,23 +17,27 @@ import java.net.URL;
 
 public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadTaskResponse> {
 
-    private static final int CONNECTION_TIMEOUT_MS = 20000;
+    private static final String TAG = "LingwaDownloadTask";
+
+    private static final int CONNECTION_TIMEOUT_MS = 10000;
     private static final int CONNECTION_RETRY = 3;
 
     //private static final String URL = "http://10.0.2.2:8085"; //local
     private static final String URL = "http://app.lingwa.io";
-    private static final String TAG = "LingwaDownloadTask";
 
+    private String projectCode;
     private OnDownloadRequestCompleted onDownloadRequestCompleted;
+    private int connectionAttempts = 0;
 
-    public DownloadTask(OnDownloadRequestCompleted onDownloadRequestCompleted){
+    public DownloadTask(String projectCode, OnDownloadRequestCompleted onDownloadRequestCompleted){
+        this.projectCode = projectCode;
         this.onDownloadRequestCompleted = onDownloadRequestCompleted;
     }
 
     @Override
     protected DownloadTaskResponse doInBackground(String... params) {
-        Log.d(TAG, "Downloading...");
-        String projectCode = params[0];
+        ++connectionAttempts;
+        Log.d(TAG, "Downloading... attempt " + connectionAttempts);
         if(projectCode == null){
             return new DownloadTaskResponse(0, "Project code is null");
         }
@@ -64,7 +68,7 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
                 }
             }
         } catch (SocketTimeoutException e) {
-            return new DownloadTaskResponse(0, "Network request timed out");
+            return new DownloadTaskResponse(408, "Network request timed out");
         } catch (IOException e) {
             return new DownloadTaskResponse(0, e.getMessage());
         }
@@ -75,10 +79,18 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
         if(onDownloadRequestCompleted !=null){
             if(response.getResponseCode()==200){
                 onDownloadRequestCompleted.onRequestSuccessful(response.getResult());
-            }else {
+            }else if(response.getResponseCode()==408 && connectionAttempts < CONNECTION_RETRY) { //fire it up again
+                DownloadTask downloadTask = new DownloadTask(projectCode, onDownloadRequestCompleted);
+                downloadTask.setConnectionAttempts(connectionAttempts);
+                downloadTask.execute();
+            } else {
                 onDownloadRequestCompleted.onRequestError(response.getResult());
             }
         }
+    }
+
+    public void setConnectionAttempts(int connectionAttempts) {
+        this.connectionAttempts = connectionAttempts;
     }
 
     public class DownloadTaskResponse{
@@ -112,6 +124,7 @@ public class DownloadTask extends AsyncTask<String, Void, DownloadTask.DownloadT
 
     public interface OnDownloadRequestCompleted {
         void onRequestSuccessful(String result);
+
         void onRequestError(String error);
     }
 }
