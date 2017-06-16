@@ -1,4 +1,4 @@
-package com.sample.lingwaio;
+package io.lingwa.sample;
 
 import android.app.Application;
 

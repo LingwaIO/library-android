@@ -5,7 +5,10 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/tv_splash"
+        android:text="Loading..."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Splash screen" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
 </RelativeLayout>

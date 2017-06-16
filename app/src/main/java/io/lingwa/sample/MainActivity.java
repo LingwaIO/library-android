@@ -1,11 +1,13 @@
-package com.sample.lingwaio;
+package io.lingwa.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 
 import io.lingwa.android.Lingwa;
+import io.lingwaio.sample.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,11 +18,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView textView = (TextView) findViewById(R.id.main_text);
+        TextView tvWelcome = (TextView) findViewById(R.id.tv_welcome);
+        Button btnChangeLang = (Button) findViewById(R.id.btn_change_lang);
+
         Lingwa.with(this)
                 .label("welcome")
-                .into(textView);
+                .into(tvWelcome);
 
-        Log.d(TAG, Lingwa.with(this).label("change_language").getText());
+        btnChangeLang.setText(Lingwa.with(this).label("change_language").getText());
     }
 }

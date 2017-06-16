@@ -1,11 +1,13 @@
-package com.sample.lingwaio;
+package io.lingwa.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import io.lingwa.android.Lingwa;
+import io.lingwaio.sample.R;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -16,6 +18,8 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        final TextView textView = (TextView) findViewById(R.id.tv_splash);
+
         Lingwa.init(this, new Lingwa.OnInitialize() {
             @Override
             public void onInitializeSuccess() {
@@ -25,6 +29,7 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onInitializeFail(String error) {
+                textView.setText("Error: " + error);
                 Log.d(TAG, error);
             }
         });
