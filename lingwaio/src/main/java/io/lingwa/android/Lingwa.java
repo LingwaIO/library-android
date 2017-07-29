@@ -12,10 +12,7 @@ import io.lingwa.android.Builders.LingwaRequestBuilder;
 
 public class Lingwa {
 
-    private static final String SHARED_PREF_LINGWA = "lingwa_shared_preference";
-
     private static LingwaInstance ourInstance;
-
     private static LingwaConfiguration configurationInstance;
 
     public static LingwaInstance getInstance(Context context) {
@@ -45,10 +42,6 @@ public class Lingwa {
             throw new RuntimeException("Lingwa was not initialised");
         }
         return new LingwaRequestBuilder(context.getApplicationContext());
-    }
-
-    public static SharedPreferences getSharedPreferences(Context context){
-        return context.getSharedPreferences(SHARED_PREF_LINGWA, Context.MODE_PRIVATE);
     }
 
     public interface OnInitialize {

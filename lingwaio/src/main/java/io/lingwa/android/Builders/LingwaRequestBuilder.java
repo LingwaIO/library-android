@@ -31,7 +31,7 @@ public class LingwaRequestBuilder {
     }
 
     public void into(TextView textView){
-        if(textView!=null){
+        if(textView != null){
             textView.setText(getText());
         }
     }

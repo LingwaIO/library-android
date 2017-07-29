@@ -6,7 +6,8 @@ package io.lingwa.android.Models;
 
 public class Translation {
 
-    private String Text, LanguageCode;
+    private String Text;
+    private String LanguageCode;
 
     public Translation(String text, String languageCode) {
         Text = text;

@@ -23,6 +23,7 @@ import io.lingwa.android.Models.Translation;
 
 public class LingwaInstance {
 
+    private static final String SHARED_PREF_LINGWA = "lingwa_shared_preference";
     private static final String PREF_LABELS = "lingwa_labels";
     private static final String PREF_LAST_UPDATE_TIME = "lingwa_last_update_time";
 
@@ -40,6 +41,35 @@ public class LingwaInstance {
         checkCacheAndLabels();
     }
 
+    public String getTranslation(String labelName, String languageCode){
+        checkCacheAndLabels();
+
+        if(languageCode==null){
+            languageCode = configuration.getLanguageCode(); //use the one set on init
+        }
+
+        for(Label label : (labels!=null? labels : new ArrayList<Label>())){
+            if(label.getLabelName().equals(labelName)){
+                String defaultTrans = null;
+                for(Translation translation : label.getTranslations()){
+                    if(translation.getLanguageCode().equals("DEFAULT")){
+                        defaultTrans = translation.getText();
+                    }else if(translation.getLanguageCode().equals(languageCode)){
+                        return translation.getText();
+                    }
+                }
+                if(defaultTrans!=null){
+                    logDebug("returning default translation");
+                    return defaultTrans;
+                }
+            }
+        }
+
+        //try looking in local resources
+        logDebug("looking in local");
+        return getStringResourceByName(labelName);
+    }
+
     private void checkCacheAndLabels(){
         if(isCacheExpired() && !isDownloading){
             isDownloading = true;
@@ -48,7 +78,7 @@ public class LingwaInstance {
                 public void onRequestSuccessful(String result) {
                     isDownloading = false;
 
-                    SharedPreferences sharedPref = Lingwa.getSharedPreferences(context);
+                    SharedPreferences sharedPref = getSharedPreferences(context);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putLong(PREF_LAST_UPDATE_TIME, (new Date(System.currentTimeMillis())).getTime());
                     editor.putString(PREF_LABELS, result);
@@ -76,7 +106,7 @@ public class LingwaInstance {
         Date now = new Date(System.currentTimeMillis());
 
         final long ONE_MINUTE_IN_MILLIS = 60000; //milliseconds
-        Date nextCheck = new Date(Lingwa.getSharedPreferences(context).getLong(PREF_LAST_UPDATE_TIME, 0) + (configuration.getExpiryMinutes() * ONE_MINUTE_IN_MILLIS));
+        Date nextCheck = new Date(getSharedPreferences(context).getLong(PREF_LAST_UPDATE_TIME, 0) + (configuration.getExpiryMinutes() * ONE_MINUTE_IN_MILLIS));
 
         if(nextCheck.before(now)){
             return true;
@@ -87,7 +117,7 @@ public class LingwaInstance {
     private void getLabelsFromCache() {
         labels = new ArrayList<>();
         try {
-            SharedPreferences sharedPref = Lingwa.getSharedPreferences(context);
+            SharedPreferences sharedPref = getSharedPreferences(context);
             String labelsString = sharedPref.getString(PREF_LABELS, "");
 
             if(labelsString.isEmpty()){
@@ -122,33 +152,8 @@ public class LingwaInstance {
         onInitialize = null;
     }
 
-    public String getTranslation(String labelName, String languageCode){
-        checkCacheAndLabels();
-
-        if(languageCode==null){
-            languageCode = configuration.getLanguageCode(); //use the one set on init
-        }
-
-        for(Label label : (labels!=null? labels : new ArrayList<Label>())){
-            if(label.getLabelName().equals(labelName)){
-                String defaultTrans = null;
-                for(Translation translation : label.getTranslations()){
-                    if(translation.getLanguageCode().equals("DEFAULT")){
-                        defaultTrans = translation.getText();
-                    }else if(translation.getLanguageCode().equals(languageCode)){
-                        return translation.getText();
-                    }
-                }
-                if(defaultTrans!=null){
-                    logDebug("returning default translation");
-                    return defaultTrans;
-                }
-            }
-        }
-
-        //try looking in local resources
-        logDebug("looking in local");
-        return getStringResourceByName(labelName);
+    private static SharedPreferences getSharedPreferences(Context context){
+        return context.getSharedPreferences(SHARED_PREF_LINGWA, Context.MODE_PRIVATE);
     }
 
     private String getStringResourceByName(String labelName) {

@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
                 .label("welcome")
                 .into(tvWelcome);
 
+        Lingwa.getConfiguration(this)
+                .setLanguageCode("fr-FR");
+
         btnChangeLang.setText(Lingwa.with(this).label("change_language").getText());
     }
 }
